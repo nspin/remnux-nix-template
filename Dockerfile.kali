@@ -1,0 +1,29 @@
+FROM kalilinux/kali-rolling
+
+# NOTE hack solution for https://forums.kali.org/showthread.php?54492-Installing-Kali-metapackage-that-requires-a-GUI-for-interaction
+# ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+        kali-linux-core
+
+RUN apt-get update && apt-get install -y \
+        openjdk-11-jre ghidra
+
+ARG UID
+ARG GID
+
+RUN groupadd -f -g $GID x && useradd -u $UID -g $GID -G sudo -m -p x x
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+RUN mkdir -p /hack && chown x /hack
+
+COPY nix.conf /etc/nix/nix.conf
+
+ARG NIX_ENV
+
+ENV PATH=${NIX_ENV}/bin:${PATH}
+ENV XAUTHORITY=/hack/Xauthority
+
+USER x
+
+WORKDIR /work

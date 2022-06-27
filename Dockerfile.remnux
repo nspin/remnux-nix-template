@@ -1,0 +1,20 @@
+FROM remnux/remnux-distro:focal
+
+ARG UID
+ARG GID
+
+# HACK
+# user remnux is 1000:1000
+
+RUN mkdir -p /hack && chown remnux /hack
+
+COPY nix.conf /etc/nix/nix.conf
+
+ARG NIX_ENV
+
+ENV PATH=${NIX_ENV}/bin:${PATH}
+ENV XAUTHORITY=/hack/Xauthority
+
+USER remnux
+
+WORKDIR /work
